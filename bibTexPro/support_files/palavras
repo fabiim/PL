@@ -1,0 +1,15 @@
+article
+book
+inbook
+incollection
+inproceedings
+manual
+mastersthesis
+misc
+phdthesis
+proceeding
+proceedings
+string
+techreport
+unpublished
+ cat  lp.bib | egrep -i ^@.*{ | sed s/^(@)([^{]*){.*/2/ | sort -df  | uniq -i  >> palavras
