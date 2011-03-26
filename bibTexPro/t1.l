@@ -1,48 +1,79 @@
-%x DETAIL
-%x AUTHORS
-%x CITKEY
-%x TITLE
+%x DETAIL AUTHORS CITKEY TITLE
 %{
 #include "bibBase.h"
 #include<strings.h>
-Reference * ref;
+Reference* ref;
 DB* database;
-
+char* category;
 %}
 %%
 @string.*$	;
 @.*\{	{yytext[strlen(yytext)-1] = '\0';
-	printf("state INITIAL, categoria: %s\n", ++yytext);
+	yytext++;
+	ref = malloc(sizeof(struct reference)); //inicializa nova estrutura
+	category = malloc(strlen(yytext));//espaco para nome da categoria
+	strcpy(category, yytext);//copiar nome da categoria
+	printf("guardado nome da categoria: %s\n", yytext);
 	BEGIN CITKEY;
 	}
 <CITKEY>.+,$				{yytext[strlen(yytext)-1]='\0';
-					printf("state CITKEY, citation key: %s\n", yytext);
+					ref->citKey = malloc(strlen(yytext));//espaco para citation key
+					strcpy(ref->citKey, yytext);//guarda citation key na struct
+					printf("guardada citation key: %s\n", yytext);
 					BEGIN DETAIL;}
-<DETAIL>^.*"author"[^{"]*(\{|\")	{printf("state DETAIL, key = author, begin authors:\n");
-					BEGIN AUTHORS;}
+<DETAIL>^.*"author"[^{"]*(\{|\")	{BEGIN AUTHORS;}
 <DETAIL>.*\}$	BEGIN 0;
 <DETAIL>.|\n	;
+<AUTHORS>.*(\}|\")","$      		{yytext[strlen(yytext)-2]='\0'; //finalizar string
+					printf("begin author capture: %s\n", yytext);
+					
+					char* temp = strstr(yytext, " and");
+					while(temp){
+					//transformar if/while num so while	
 
 
-<AUTHORS>.*[^a-zA-Z]and[^a-zA-Z] 	printf("\nstate AUTHORS, author: %s\n", yytext);
-<AUTHORS>(\}|\")","$			{printf("state AUTHORS, END AUTHORS: %s\n", yytext);
+
+
+
+
+
+					}
+					/*if(temp == NULL){
+						//guarda so um autor
+						ref->autores[0] = malloc(strlen(yytext));
+						strcpy(ref->autores[0], yytext);
+						printf("inserido apenas um autor: %s", yytext);
+					}else{
+						//pelo menos 2 autores e existe já um "and" apontado
+						int i = 1;
+						while(temp){//guardar todos os autores
+							yytext[temp-yytext] = '\0';
+							printf("capturado autor %d: %s\n", i, yytext);
+							yytext = temp + 4;
+							temp = strstr(yytext, " and");
+							i++;
+						}
+						printf("ultimo autor: %s\n", yytext);
+					}*/
 					BEGIN DETAIL;}
-<AUTHORS>.*[ \t]*([a-zA-Z]+|[.-])+	printf("%s\n", yytext);
-
 <AUTHORS>.|\n	;
-
 <DETAIL>^.*"title"[^{]*\{		{printf("state DETAIL, key = title, begin TITLE:\n");
 					BEGIN TITLE;}
-<TITLE>.*(\}|\"),$			{printf("state TITLE, title: %s\n", yytext);
+<TITLE>.*(\}|\"),$			{yytext[strlen(yytext)-2]='\0';
+					printf("state TITLE, title: %s\n", yytext);
 					BEGIN INITIAL;}
 .|\n	;
 %%
 int yywrap(){
+	//chamar função de geração de html
 return 1;
 }
 int main(int argc, char* argv[]){
-	//ref = malloc(sizeof(struct reference));
+	//Reference
+	ref = malloc(sizeof(struct reference));
+	//DB
 	database = initDB();
-	yylex();
+	
+        yylex();
 	return 0;
 }
