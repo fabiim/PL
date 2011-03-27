@@ -8,7 +8,7 @@ teste_bibBase : include/dictlist.o include/hashing.o include/common.o bibBase.o 
 dictlist.o : include/dictlist.c include/dictlist.h
 	cd include ; gcc -Wall  -g -c dictlist.c 
 hashing.o : include/hashing.c include/hashing.h
-	cd include ; gcc -Wall -g -chashing.c 
+	cd include ; gcc -Wall -g -c hashing.c 
 common.o : include/common.c include/common.h
 	cd include ; gcc -Wall -g -c common.c 
 t_bibBase.o: t_bibBase.c 

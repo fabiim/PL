@@ -11,69 +11,47 @@ char* category;
 @.*\{	{yytext[strlen(yytext)-1] = '\0';
 	yytext++;
 	ref = malloc(sizeof(struct reference)); //inicializa nova estrutura
-	category = malloc(strlen(yytext));//espaco para nome da categoria
-	strcpy(category, yytext);//copiar nome da categoria
-	printf("guardado nome da categoria: %s\n", yytext);
+	category = strdup(yytext);
 	BEGIN CITKEY;
 	}
 <CITKEY>.+,$				{yytext[strlen(yytext)-1]='\0';
-					ref->citKey = malloc(strlen(yytext));//espaco para citation key
-					strcpy(ref->citKey, yytext);//guarda citation key na struct
-					printf("guardada citation key: %s\n", yytext);
+					ref->citKey = strdup(yytext);
 					BEGIN DETAIL;}
 <DETAIL>^.*"author"[^{"]*(\{|\")	{BEGIN AUTHORS;}
-<DETAIL>.*\}$	BEGIN 0;
+<DETAIL>.*\}$	                        {//fazer free a pointers nao necessarios, guardar ref na BD
+                                        addCitation(database, category, ref);
+                                        free(category);
+                                        BEGIN 0;}
 <DETAIL>.|\n	;
 <AUTHORS>.*(\}|\")","$      		{yytext[strlen(yytext)-2]='\0'; //finalizar string
-					printf("begin author capture: %s\n", yytext);
+					int i = 0;
+                                        char* substring = strstr(yytext, " and ");
+                                        while(substring){
+                                                substring[0] = '\0';
+                //->                            //aqui guardar yytext no ref->autores----------------------
+                                                yytext = substring + 5; //por causa do " and "
+                                                substring = strstr(yytext, " and ");
+                                        }
+					//guardar ultimo ou unico autor
+		//->			//aqui guardar yytext no ref->autores-------------------------------
 					
-					char* temp = strstr(yytext, " and");
-					while(temp){
-					//transformar if/while num so while	
-
-
-
-
-
-
-
-					}
-					/*if(temp == NULL){
-						//guarda so um autor
-						ref->autores[0] = malloc(strlen(yytext));
-						strcpy(ref->autores[0], yytext);
-						printf("inserido apenas um autor: %s", yytext);
-					}else{
-						//pelo menos 2 autores e existe já um "and" apontado
-						int i = 1;
-						while(temp){//guardar todos os autores
-							yytext[temp-yytext] = '\0';
-							printf("capturado autor %d: %s\n", i, yytext);
-							yytext = temp + 4;
-							temp = strstr(yytext, " and");
-							i++;
-						}
-						printf("ultimo autor: %s\n", yytext);
-					}*/
-					BEGIN DETAIL;}
+                                        BEGIN DETAIL;}
 <AUTHORS>.|\n	;
-<DETAIL>^.*"title"[^{]*\{		{printf("state DETAIL, key = title, begin TITLE:\n");
-					BEGIN TITLE;}
+<DETAIL>^.*"title"[^{]*\{               {BEGIN TITLE;}
 <TITLE>.*(\}|\"),$			{yytext[strlen(yytext)-2]='\0';
-					printf("state TITLE, title: %s\n", yytext);
+					ref->title = strdup(yytext);
 					BEGIN INITIAL;}
 .|\n	;
 %%
 int yywrap(){
-	//chamar função de geração de html
+	//chamar função de geração de html/dot
 return 1;
 }
 int main(int argc, char* argv[]){
-	//Reference
-	ref = malloc(sizeof(struct reference));
-	//DB
+        //parse argv into filenames? or just authors?
+	//Database
 	database = initDB();
-	
+	//printf("Base de dados iniciada, programa vai iniciar:\n");
         yylex();
 	return 0;
 }

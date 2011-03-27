@@ -887,9 +887,7 @@ YY_RULE_SETUP
 {yytext[strlen(yytext)-1] = '\0';
 	yytext++;
 	ref = malloc(sizeof(struct reference)); //inicializa nova estrutura
-	category = malloc(strlen(yytext));//espaco para nome da categoria
-	strcpy(category, yytext);//copiar nome da categoria
-	printf("guardado nome da categoria: %s\n", yytext);
+	category = strdup(yytext);
 	BEGIN CITKEY;
 	}
 	YY_BREAK
@@ -898,17 +896,15 @@ case 3:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 19 "t1.l"
+#line 17 "t1.l"
 {yytext[strlen(yytext)-1]='\0';
-					ref->citKey = malloc(strlen(yytext));//espaco para citation key
-					strcpy(ref->citKey, yytext);//guarda citation key na struct
-					printf("guardada citation key: %s\n", yytext);
+					ref->citKey = strdup(yytext);
 					BEGIN DETAIL;}
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 24 "t1.l"
+#line 20 "t1.l"
 {BEGIN AUTHORS;}
 	YY_BREAK
 case 5:
@@ -916,13 +912,16 @@ case 5:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 25 "t1.l"
-BEGIN 0;
+#line 21 "t1.l"
+{//fazer free a pointers nao necessarios, guardar ref na BD
+                                        addCitation(database, category, ref);
+                                        free(category);
+                                        BEGIN 0;}
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 26 "t1.l"
+#line 25 "t1.l"
 ;
 	YY_BREAK
 case 7:
@@ -930,75 +929,55 @@ case 7:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 27 "t1.l"
+#line 26 "t1.l"
 {yytext[strlen(yytext)-2]='\0'; //finalizar string
-					printf("begin author capture: %s\n", yytext);
+					int i = 0;
+                                        char* substring = strstr(yytext, " and ");
+                                        while(substring){
+                                                substring[0] = '\0';
+                //->                            //aqui guardar yytext no ref->autores----------------------
+                                                yytext = substring + 5; //por causa do " and "
+                                                substring = strstr(yytext, " and ");
+                                        }
+					//guardar ultimo ou unico autor
+		//->			//aqui guardar yytext no ref->autores-------------------------------
 					
-					char* temp = strstr(yytext, " and");
-					while(temp){
-					//transformar if/while num so while	
-
-
-
-
-
-
-
-					}
-					/*if(temp == NULL){
-						//guarda so um autor
-						ref->autores[0] = malloc(strlen(yytext));
-						strcpy(ref->autores[0], yytext);
-						printf("inserido apenas um autor: %s", yytext);
-					}else{
-						//pelo menos 2 autores e existe já um "and" apontado
-						int i = 1;
-						while(temp){//guardar todos os autores
-							yytext[temp-yytext] = '\0';
-							printf("capturado autor %d: %s\n", i, yytext);
-							yytext = temp + 4;
-							temp = strstr(yytext, " and");
-							i++;
-						}
-						printf("ultimo autor: %s\n", yytext);
-					}*/
-					BEGIN DETAIL;}
+                                        BEGIN DETAIL;}
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 59 "t1.l"
+#line 39 "t1.l"
 ;
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 60 "t1.l"
-{printf("state DETAIL, key = title, begin TITLE:\n");
-					BEGIN TITLE;}
+#line 40 "t1.l"
+{BEGIN TITLE;}
 	YY_BREAK
 case 10:
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 62 "t1.l"
+#line 41 "t1.l"
 {yytext[strlen(yytext)-2]='\0';
-					printf("state TITLE, title: %s\n", yytext);
+					ref->title = strdup(yytext);
 					BEGIN INITIAL;}
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 65 "t1.l"
+#line 44 "t1.l"
 ;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 66 "t1.l"
+#line 45 "t1.l"
 ECHO;
 	YY_BREAK
-#line 1002 "t1.c"
+#line 981 "t1.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(DETAIL):
 case YY_STATE_EOF(AUTHORS):
@@ -2003,19 +1982,18 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 66 "t1.l"
+#line 45 "t1.l"
 
 
 int yywrap(){
-	//chamar função de geração de html
+	//chamar função de geração de html/dot
 return 1;
 }
 int main(int argc, char* argv[]){
-	//Reference
-	ref = malloc(sizeof(struct reference));
-	//DB
+        //parse argv into filenames? or just authors?
+	//Database
 	database = initDB();
-	
+	//printf("Base de dados iniciada, programa vai iniciar:\n");
         yylex();
 	return 0;
 }
