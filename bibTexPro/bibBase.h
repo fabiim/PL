@@ -22,7 +22,8 @@ typedef struct  db DB;
 typedef struct reference {
   char * citKey; 
   char **autores; 
-  char *title; 
+  char *title;
+  int nAuthors;
 }Reference; 
 
 /**
