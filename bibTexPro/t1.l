@@ -21,44 +21,36 @@ void find_authors(char* text);
 					ref = malloc(sizeof(struct reference)); //inicializa nova estrutura
 					ref->nAutores = 0;
 				        category = strdup(yytext);
-					//printf("guarda categoria:_%s_\n", category);
-					BEGIN CITKEY;
-					}
+					printf("guarda categoria:_%s_\n", category);
+					BEGIN CITKEY;}
+
 <CITKEY>.+,$				{yytext[strlen(yytext)-1]='\0';
 					ref->citKey = strdup(yytext);
 	//				printf("guarda citKey:_%s_\n", yytext);
 					BEGIN DETAIL;}
-<DETAIL>^.*"author"[^"]*\"		{BEGIN AUTHORSASP;}
-<DETAIL>^.*"author"[^{]*\{		{BEGIN AUTHORS;}
+<DETAIL>^.*"author"[^{"]+(\{|\")	{BEGIN AUTHORS;}
 
 <DETAIL>.*\}$	                        {//fazer free a pointers nao necessarios, guardar ref na BD
           //                              printf("guarda ref na BD\n");
 					addCitation(database, category, ref);
-                                        free(category);
+                                        printf("passada category:_%s_\n", category);
+//                                        free(category);
 					BEGIN 0;}
-<DETAIL>.|\n	;
-<AUTHORS>[^=]+\}","$     		{yytext[strlen(yytext)-2]='\0'; //finalizar string
-                                        find_authors(yytext);
-                                        BEGIN DETAIL;}
-<AUTHORSASP>[^=]+\"","$                 {yytext[strlen(yytext)-2]='\0'; //finalizar string
+
+<AUTHORS>.*(\}|\")","?$     		{yytext[strlen(yytext)-2]='\0'; //finalizar string
                                         find_authors(yytext);
                                         BEGIN DETAIL;}
 
-<DETAIL>^.*"title"[ \t=]+(\{)           {BEGIN TITLE;}//diferenciar entre um titulo entre aspas e parêntesis
-<DETAIL>^.*"title"[ \t=]+(\")		{BEGIN TITLEASP;}
+<DETAIL>^.*"title"[^{"]+(\{|\")         {BEGIN TITLE;}
 
-<TITLE>[^}]+\}","$			{yytext[strlen(yytext)-2]='\0';
+<TITLE>.*(\}|\")","?$			{yytext[strlen(yytext)-2]='\0';
 					ref->title = strdup(yytext);
 	//				printf("guarda titulo:_%s_\n", yytext);
 					BEGIN DETAIL;}
-<TITLEASP>[^"]+\"","$			{yytext[strlen(yytext)-2]='\0';
-					ref->title = strdup(yytext);
-	//				printf("guarda titulo asp:_%s_\n", yytext);
-					BEGIN DETAIL;}
 
+<DETAIL>.|\n    ;
 <<EOF>>					{printf("found EOF\n");
 					yyterminate();}
-
 
 .|\n	;
 
@@ -69,7 +61,7 @@ void find_authors(char* text){
         ref->autores = malloc(reserved*sizeof(char*));
         while(substring){
                 substring[0] = '\0';
-                printf("guardar autor:_%s_\n", yytext);
+                //printf("guardar autor:_%s_\n", yytext);
                 if(i>=reserved){
                         reserved = i+3;
                         ref->autores = realloc(ref->autores, reserved*sizeof(char*));
@@ -85,7 +77,7 @@ void find_authors(char* text){
         }
         ref->autores[i] = strdup(yytext);
 	ref->autores[i+1] = NULL;
-	printf("guarda autor:_%s_\n", yytext);
+	//printf("guarda autor:_%s_\n", yytext);
 	ref->nAutores++;
 	i = 0;
 	reserved = 3;
