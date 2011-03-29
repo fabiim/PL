@@ -23,7 +23,7 @@ typedef struct reference {
   char * citKey; 
   char **autores; 
   char *title;
-  int nAuthors;
+  int nAutores;
 }Reference; 
 
 /**

@@ -1,6 +1,6 @@
 
 t1 : t1.c
-	gcc -o t1 t1.c bibBase.o include/dictlist.o include/hashing.o include/common.o -lfl
+	gcc -g -o t1 t1.c bibBase.o include/dictlist.o include/hashing.o include/common.o -lfl
 t1.c : t1.l
 	flex -o t1.c t1.l
 teste_bibBase : include/dictlist.o include/hashing.o include/common.o bibBase.o t_bibBase.o
