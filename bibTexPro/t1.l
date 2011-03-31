@@ -27,9 +27,14 @@ void find_authors(char* text);
 					BEGIN DETAIL;}
 <DETAIL>^.*"author"[^{"]+(\{|\")	{BEGIN AUTHORS;}
 
-<DETAIL>.*\}$	                        {//fazer free a pointers nao necessarios, guardar ref na BD
-					addCitation(database, category, ref);
-//                                        free(category);
+<DETAIL>.*\}$	                        {//fazer free a pointers nao necessarios, guardar ref na BD se estiver completa
+					if(ref && category){
+						if(ref->autores && ref->title)
+							addCitation(database, category, ref);
+					}else{
+						free(ref);
+						free(category);
+					}
 					BEGIN 0;}
 
 <AUTHORS>.*(\}|\")","?$     		{yytext[strlen(yytext)-2]='\0'; //finalizar string
@@ -44,7 +49,12 @@ void find_authors(char* text);
 
 <DETAIL>.|\n    ;
 
-<<EOF>>					{yyterminate();}
+<<EOF>>					{if(html){
+         			      	   dump_html_file(database, path);
+       					 }else if(dot){
+              				   dump_dot_file(database, path, author);
+        				 }	
+					yyterminate();}
 
 .|\n	;
 
@@ -73,16 +83,6 @@ void find_authors(char* text){
 	ref->nAutores++;
 	i = 0;
 	reserved = 3;
-}
-
-int yywrap(){
-	//chamar função de geração de html/dot
-        if(html){
-               dump_html_file(database, path);
-        }else if(dot){
-               dump_dot_file(database, path, author);
-        }
-return 1;
 }
 
 void print_help(){

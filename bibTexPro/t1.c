@@ -901,11 +901,9 @@ YY_RULE_SETUP
 #line 18 "t1.l"
 {yytext[strlen(yytext)-1] = '\0';
 	 				yytext++;
-	 				//printf("espaco para estrutura\n");
 					ref = malloc(sizeof(struct reference)); //inicializa nova estrutura
 					ref->nAutores = 0;
 				        category = strdup(yytext);
-					printf("guarda categoria:_%s_\n", category);
 					BEGIN CITKEY;}
 	YY_BREAK
 case 3:
@@ -913,16 +911,15 @@ case 3:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 27 "t1.l"
+#line 25 "t1.l"
 {yytext[strlen(yytext)-1]='\0';
 					ref->citKey = strdup(yytext);
-	//				printf("guarda citKey:_%s_\n", yytext);
 					BEGIN DETAIL;}
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 31 "t1.l"
+#line 28 "t1.l"
 {BEGIN AUTHORS;}
 	YY_BREAK
 case 5:
@@ -930,12 +927,15 @@ case 5:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 33 "t1.l"
-{//fazer free a pointers nao necessarios, guardar ref na BD
-          //                              printf("guarda ref na BD\n");
-					addCitation(database, category, ref);
-                                        printf("passada category:_%s_\n", category);
-//                                        free(category);
+#line 30 "t1.l"
+{//fazer free a pointers nao necessarios, guardar ref na BD se estiver completa
+					if(ref && category){
+						if(ref->autores && ref->title)
+							addCitation(database, category, ref);
+					}else{
+						free(ref);
+						free(category);
+					}
 					BEGIN 0;}
 	YY_BREAK
 case 6:
@@ -962,13 +962,12 @@ YY_RULE_SETUP
 #line 46 "t1.l"
 {yytext[strlen(yytext)-2]='\0';
 					ref->title = strdup(yytext);
-	//				printf("guarda titulo:_%s_\n", yytext);
 					BEGIN DETAIL;}
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 51 "t1.l"
+#line 50 "t1.l"
 ;
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
@@ -979,21 +978,25 @@ case YY_STATE_EOF(CITKEY):
 case YY_STATE_EOF(TITLE):
 case YY_STATE_EOF(TITLEASP):
 #line 52 "t1.l"
-{printf("found EOF\n");
+{if(html){
+         			      	   dump_html_file(database, path);
+       					 }else if(dot){
+              				   dump_dot_file(database, path, author);
+        				 }	
 					yyterminate();}
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 55 "t1.l"
+#line 59 "t1.l"
 ;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 57 "t1.l"
+#line 61 "t1.l"
 ECHO;
 	YY_BREAK
-#line 997 "t1.c"
+#line 1000 "t1.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1992,7 +1995,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 57 "t1.l"
+#line 61 "t1.l"
 
 
 void find_authors(char* text){
@@ -2001,7 +2004,6 @@ void find_authors(char* text){
         ref->autores = malloc(reserved*sizeof(char*));
         while(substring){
                 substring[0] = '\0';
-                //printf("guardar autor:_%s_\n", yytext);
                 if(i>=reserved){
                         reserved = i+3;
                         ref->autores = realloc(ref->autores, reserved*sizeof(char*));
@@ -2017,27 +2019,19 @@ void find_authors(char* text){
         }
         ref->autores[i] = strdup(yytext);
 	ref->autores[i+1] = NULL;
-	//printf("guarda autor:_%s_\n", yytext);
 	ref->nAutores++;
 	i = 0;
 	reserved = 3;
 }
 
-int yywrap(){
-	//chamar função de geração de html/dot
-        if(html){
-               dump_html_file(database, path);
-        }else if(dot){
-               dump_dot_file(database, path, author);
-        }
-return 1;
+void print_help(){
+	printf("\nUsage:\n");
+        printf("--html path\t\tDump html file to path\n");
+        printf("--dot path author\tDump dot file to path with author context\n");
 }
-
 int main(int argc, char* argv[]){
         if(argc<3){
-                printf("Usage:\n");
-                printf("--html path\t\tDump html file to path\n");
-                printf("--dot path author\tDump dot file to path with author context\n");
+                print_help();
                 return 0;
         }else if(!strcmp(argv[1], "--html")){
                 html = 1;
@@ -2046,7 +2040,8 @@ int main(int argc, char* argv[]){
 		printf("html escolhido, path =_%s_\n", path);
         }else if(!strcmp(argv[1], "--dot")){
                 if(argc<4){
-                       printf("Usage of dot file requires path and author as arguments\n"); 
+			print_help();
+			return 0; 
                 }
                 dot = 1;
                 html = 0;
