@@ -24,6 +24,7 @@ typedef struct reference {
   char **autores; 
   char *title;
   int nAutores;
+    int size; 
 }Reference; 
 
 /**
@@ -31,6 +32,19 @@ typedef struct reference {
  * Retorna um ptr para DB que deve ser utilizado para chamar as funções neste módulo.
  */
 DB *initDB(); 
+
+/**
+ * Retorna referencia inicializada
+ */
+
+
+Reference *initRef(); 
+/*
+  Limpa espaços , cria espaço. usar copia retornada.
+ */
+char * cleanString( char *string);
+// adiciona autor à estrutura , aumentado a mesma se necessario.
+void add(Reference *ref , char *author); 
 
 /*
   Adiciona uma nova citação(ref) de uma respectiva categoria (cat) à bd.

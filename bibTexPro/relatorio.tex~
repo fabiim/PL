@@ -1,0 +1,272 @@
+\documentclass[a4paper]{article}
+\usepackage[portuges]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{url}
+\usepackage{listings}
+
+\setlength{\oddsidemargin}{-1cm}
+\setlength{\textwidth}{18cm}
+\setlength{\headsep}{-1cm}
+\setlength{\textheight}{23cm}
+
+\parindent=0pt
+\parskip=2pt
+\newtheorem{questao}{Quest\~{a}o}
+
+\def\wiki{\textsf{Wikipedia}}
+
+\begin{document}
+
+\title{}
+\author{Trabalho Prático nº 1\\ (Lex)}
+\date{Ano lectivo 10/11}
+
+\maketitle
+
+%--------------------------------------------------------------------------
+\section{Objectivos e Organização}
+Este trabalho prático tem como principais {\bf objectivos}:
+\begin{itemize}
+\item
+aumentar a experiência de uso do ambiente \textsf{Linux}, da linguagem
+imperativa \textsf{C} (para codificação das estruturas de dados e
+respectivos algoritmos de manipulação), e de algumas ferramentas de apoio à programação;
+\item
+aumentar a capacidade de escrever \emph{Expressões Regulares (ER)} para descrição de \emph{padrões de frases};
+\item
+desenvolver, a partir de ERs, sistemática e automaticamente \emph{Processadores de Linguagens Regulares}, que filtrem ou transformem textos;
+\item
+utilizar  \emph{geradores de filtros/processadores de texto}, como o {\sf Flex}
+\end{itemize}
+
+Para o efeito, esta folha contém vários enunciados, dos quais deverá resolver pelo menos um.
+%\footnote{Se resolver mais, cada um será avaliado separadamente e a nota final será a média das notas individuais obtidas.}.\\
+O programa desenvolvido será apresentado aos membros da equipa docente, totalmente pronto
+e  a funcionar (acompanhado do respectivo relatório de desenvolvimento)
+e será defendido por todos os elementos do grupo (3 alunos), em data a marcar.\\
+%
+O \textbf{relatório} a elaborar, deve ser claro e, além do
+respectivo enunciado, da descrição do problema, das decisões que
+lideraram o desenho e a implementação, deverá conter exemplos
+de utilização (textos fontes diversos e respectivo resultado produzido).
+Como é de tradição, o relatório  será escrito em \LaTeX.\\
+%
+
+%--------------------------------------------------------------------------
+\section{Enunciados}
+Para sistematizar o trabalho que se  pede em cada uma das propostas seguintes,
+considere que deve, em qualquer um dos casos, realizar a seguinte lista de tarefas:
+\begin{enumerate}
+\item Especificar os padrões de frases que quer encontrar no texto-fonte, através de ERs.
+\item Identificar as acções semânticas a realizar como reacção ao reconhecimento de cada um desses padrões.
+\item Identificar as Estruturas de Dados globais que possa eventualmente precisar para armazenar temporariamente
+a informação que vai extraindo do texto-fonte ou que vai construindo à medida que o processamento avança.
+\item Desenvolver um Processador de Texto para fazer o reconhecimento dos padrões identificados e
+proceder à transformação pretendida, com recurso ao Gerador \textsf{Flex}.
+\end{enumerate}
+%-----------------------------------------------------------------------------
+\subsection{BibTeXPro --- Um processador de BibTeX}
+BibTeX é uma ferramenta de formatação de citações bibliográficas em documentos \LaTeX,
+criada com o objectivo de facilitar a separação da base de dados da bibliografia consultada
+da sua apresentação no fim do documento \LaTeX\ em edição.
+BibTeX foi criada por Oren Patashnik e Leslie Lamport em 1985, tendo cada entrada nessa base de dados
+textual o aspecto que se ilustra a seguir
+
+\begin{lstlisting}[frame=trbl,caption={Exemplo de entrada em BibTex}]
+@InProceedings{CPBFH07e,
+  author =    {Daniela da Cruz and Maria João Varanda Pereira
+               and Mário Béron and Rúben Fonseca and
+               Pedro Rangel Henriques},
+  title =     {Comparing Generators for Language-based Tools},
+  booktitle = {Proceedings of the 1.st Conference on Compiler
+               Related Technologies and Applications, CoRTA'07
+               --- Universidade da Beira Interior, Portugal},
+  year =      {2007},
+  editor =    {},
+  month =     {Jul},
+}
+\end{lstlisting}
+De modo a familiarizar-se com o formato do BibTeX poderá consultar o ficheiro \texttt{lp.bib}
+disponível em \url{http://www.di.uminho.pt/~prh/lp.bib} e ainda a página oficial do
+formato referido (\url{http://www.bibtex.org/}),
+devendo para já saber que a primeira palavra (logo a seguir ao caracter "@")
+designa a categoria da referência (havendo em BibTeX pelo menos 14 diferentes).
+
+As tarefas que deverá executar neste trabalho prático são:
+\begin{description}
+\item[a)] Analise o documento BibTeX referido acima e faça a contagem das categorias
+(\texttt{phDThesis}, \texttt{Misc}, \texttt{InProceeding}, etc.), que ocorrem no documento.
+No final, deverá produzir um documento em formato HTML com o nome das categorias encontradas e respectivas contagens.
+
+\item[b)] Complete o processador de modo a filtrar, para cada entrada de cada categoria,
+a respectiva chave-de-citação (a 1ªpalavra a seguir à chaveta), autores e título.
+O resultado final deverá ser incluido  no documento HTML gerado na alínea anterior.\\
+Alternativamente, ou em complemento,
+gere um índice de autores, que mapeie cada autor nos respectivos registos (ou seja, na chave-de-citação, tipo e ano).
+
+\item[c)] Construa um Grafo que mostre, para um dado autor (escolhido pelo utilizador)
+todos os autores que publicam normalmente com o autor em causa.\\
+Recorrendo à linguagem Dot do GraphViz\footnote{Disponível em \url{http://www.graphviz.org}},
+gere um ficheiro com esse grafo de modo a que
+possa, posteriormente, usar uma das ferramentas que processam
+Dot~\footnote{Disponíveis em \url{http://www.graphviz.org/Resources.php}}
+para desenhar o dito grafo de associações de autores.
+
+\end{description}
+%--------------------------------------------------------------------------
+
+\subsection{Pré-processador para LaTeX ou HTML}
+Desenvolver um documento em \LaTeX\ ou mesmo em \textsf{HTML} é uma actividade inteligente
+ e intelectualmente interessante
+enquanto  estruturante das ideias e sistematizante dos processos.
+
+Porém o acto de editar o respectivo documento é por vezes fastidioso devido ao peso das marcas (as \emph{tags})
+que tem de ser inseridas para anotar o texto com indicações de forma, conteúdo ou formato.
+
+Por isso apareceram editores sensíveis ao contexto que sabendo que se está a escrever um documento
+\LaTeX\ ou \textsf{HTML} nos facilitam a vida inserindo as ditas marcas, ou anotações.
+
+Uma alternativa mais simples mas também muito frequente é permitir o uso de anotações mais leves e simples
+(até de preferência independentes do tipo de documento final) e de pois recorrer ao pré-processamento para substituir essa
+notação ligeira, abreviada, pelas marcas finais correctas.
+
+Este é o caso do conhecido  \textsf{PPP}\footnote{Consultar detalhes no manual da linguagem
+em \url{http://www.di.uminho.pt/~jcr/AULAS/plc2008/tp1/ppp.html}.},
+desenvolvido há alguns anos por José Carlos Ramalho, ou mesmo do mais actual e não menos conhecido sistema
+\textsf{Wiki} para construção interactiva e via web de páginas HTML.
+
+O que se lhe pede neste trabalho é que, depois de investigar os tais pré-processadores \textsf{PPP}, \textsf{Wiki},
+ou outro análogo,
+especifique uma sua linguagem de anotação para abreviar a escrita de \textbf{formatação}
+(\emph{negrito}, \emph{itálico}, \emph{sublinhado}, vários níveis de \emph{títulos})
+e \textbf{listas de tópicos (items)} \emph{não-numerados}, \emph{numerados} ou tipo
+\emph{entradas de um dicionário}.
+
+Deve, depois e recorrendo à ferramenta \textsf{Flex}, criar um processador que transforme a sua notação em
+\LaTeX\ ou \textsf{HTML}\footnote{O mais interessante mesmo é que fosse possível escolher a saída final
+no inicio do próprio texto a pré-processar.}.
+%--------------------------------------------------------------------------
+
+\subsection{LaTeX importer}
+Desenvolva um pré-processador que aceite texto \LaTeX\ com mais uma marcação especial \texttt{umImport},
+\begin{verbatim}
+                \begin{umImport}{gnuplot}
+                ...texto gnuplot....
+                \end{umImport}
+\end{verbatim}
+e que receba, como parâmetro, um segundo elemento (no exemplo acima \textsf{gnuplot})
+indicativo do processador a utilizar.
+
+Como resultado o pré-processador deverá:
+\begin{itemize}
+    \item copiar para um ficheiro auxiliar o texto em causa (marcado pelo novo elemento),
+    \item executar um comando externo que construa uma imagem PDF aplicando a esse ficheiro o processador indicado,
+    \item substituir o texto e a nova marca que o envolve pelo comando \texttt{includegraphics} para importar a imagem PDF produzida.
+\end{itemize}
+Sugestões: comece por considerar os formatos \textsf{gnuplot} e \textsf{dot}, mas guarde numa tabela os comandos
+externos a executar para produzir a imagem PDF, de modo a facilitar a definição de novos formatos de importação.
+%--------------------------------------------------------------------------
+
+%\subsection{XML to dot}
+%Pretende-se neste trabalho criar e desenhar um grafo de dependências entre os elementos
+%de um documento anotado em \textsf{XML}.
+%
+%Para isso e dado um ficheiro \textsf{XML}, cada vez que encontrar um elemento X com um subelemento Y, exemplo:
+%\begin{verbatim}
+                %<X> ...
+                    %<Y> ... </Y>
+                    %...
+                %</X>
+%\end{verbatim}
+%deve gerar uma linha dot-graphviz de modo a que no final se possa obter uma árvore documental
+%com a estrutura de elementos. No final gere a imagem respectiva com o comando dot.
+%
+%Exemplo de ficheiro dot a gerar:
+%\begin{verbatim}
+                %strict  digraph g {
+                %x -> y ;
+                %a -> b ;
+                %a -> x ;
+                %x -> c ;
+                %}
+%\end{verbatim}
+%--------------------------------------------------------------------------
+
+\subsection{Processamento da Wikipedia}
+
+
+A \wiki\ é actualmente uma base de conhecimento online disponível em várias línguas (entre as quais, o português).
+Como tal, e por estar disponível num formato passível de transformação (\textsf{XML}) muitas são as ferramentas que
+trabalham sobre a \wiki\ para produzir diferentes resultados.
+
+Neste trabalho pretende-se que desenvolva em \textsf{Flex} um filtro para estruturar, num site HTML,
+um conjunto de informações extraídas da \wiki. Para isso precisará de exportar uma ou mais páginas usando o \textsf{Special Export}
+disponível em \url{http://pt.wikipedia.org/wiki/Especial:Exportar} (ou \url{http://en.wikipedia.org/wiki/Special:Export} 
+para a versão inglesa). Estude o seu conteúdo de forma a produzir os seguintes resultados para cada página
+existente no ficheiro \textsf{XML} obtido:
+\begin{itemize}
+\item Título;
+\item Autor da última revisão;
+\item Data da última revisão;
+\item Nº de links internos ( e explicitar quais);
+\item Nº de links externos (e explicitar quais);
+\item Nº de secções (e explicitar quais).
+\end{itemize}
+
+Estude ainda a possibilidade de gerar uma página HTML para cada página existente no ficheiro com o respectivo conteúdo original, colocando 
+como cabeçalho as informações referidas acima (escolha um \emph{layout} do seu gosto para a página HTML).
+
+\subsection{Processamento de Códigos Postais}
+Neste trabalho pretende-se que desenvolva em \textsf{Flex} um filtro para
+estruturar, num site HTML, por \emph{regiões postais} (uma página por região)
+os Códigos Postais de Portugal,
+a partir de uma base de dados textual que lhe será fornecida,
+atendendo a que dentro de cada região, os códigos devem vir agrupados por ordem crescente das
+ \emph{áreas postais} (do respectivo número); por cada área deve surgir uma nova página HTML onde se reunem
+todos os códigos dessa área ordenados por ordem alfabética de freguesia.
+
+A BD original contém um código por linha no seguinte formato:
+\begin{verbatim}
+                DDDD-DDD Ident, IDENT
+\end{verbatim}
+por exemplo
+\begin{verbatim}
+                4100-123 Boavista, PORTO
+                4710-057 Gualtar, BRAGA
+\end{verbatim}
+Em relação ao radical, sabe-se que o 1º dígito (1 a 9) identifica uma das nove \emph{regiões postais} do País
+(1=Lisboa, \ldots, 9=Ilhas)
+e que os restantes 3 dígitos identificam a \emph{área postal} cujo nome (em maiúsculas) é a ultima palavra da linha;
+a primeira palavra identifica a \emph{freguesia} dentro da área.
+Os 3 dígitos da extensão designam o \emph{bairro} ou \emph{rua} dentro dessa freguesia.
+
+Melhore o seu processador, acrescentado uma nova funcionalidade  que gere
+\textsf{SQL} para inserir o Código, a Área postal e a  Freguesia em 3 colunas de uma Tabela de uma base de dados em que o
+código seja a chave.
+
+Recorrendo à linguagem \textsf{Dot} do \textsf{GraphViz}\footnote{Disponível em \url{http://www.graphviz.org}},
+gere um ficheiro com a árvore de regiões e áreas postais de modo a que
+possa, posteriormente, usar uma das ferramentas que processam
+\textsf{Dot}~\footnote{Disponíveis em \url{http://www.graphviz.org/Resources.php}}
+para desenhar a dita árvore com a estrutura hierárquica da organização postal
+de Portugal---para começar considere que a raíz da árvore tem o código 0 e
+corresponde a Portugal, mas como a árvore pode ficar muito grande permita, depois,
+que seja o utilizador a escolher a raíz indicando o número da região que deseja visualizar.
+%--------------------------------------------------------------------------
+
+\subsection{Processamento de Trilhos GPS}
+O formato \textsf{GPX} armazena \emph{trilhos de GPS}.
+Milhares desses trilhos estão
+disponíveis na \textsf{internet}, podendo ser descarregados, por exemplo, a
+partir do site \url{www.openstreetmap.org}, escolhendo  a opção \texttt{'GPS traces'}.
+
+Quem tiver um telemóvel ou \textsf{PDA} com \textsf{GPS} pode também registar trilhos, e
+depois descarregá-los no formato \textsf{GPX} (dependendo do software que usar
+para o registo).
+
+Desenvolva em \textsf{Flex} um filtro que transforme um documento em formato
+\textsf{GPX} no formato \textsf{KML}.
+O documento resultante, no formato \textsf{KML}, deverá ser visualizado no
+\textsf{GoogleEarth}, ou noutro visualizador qualquer.
+
+\end{document}

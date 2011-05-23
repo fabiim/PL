@@ -1,0 +1,9 @@
+#ifndef __AST__H
+#define __AST__H
+#define GREATER 1
+#define LOWER 2 ; 
+#define DIFFERENT 3; 
+#define EQUAL 4; 
+#define GREATER_OR_EQUAL 5
+#define LOWER_OR_EQUAL 6 
+#endif

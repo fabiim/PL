@@ -1,0 +1,260 @@
+%option noyywrap nodefault yylineneo
+
+%{
+#include "ast.h"
+#include "grammar.tab.h" 
+%}
+SPACE	(" "|\t|\n|\r)
+DIGITO [0-9]
+ALPHA [a-ZA-Z] 
+IDENTIFIER ({ALPHA}| "_")({ALPHA}| {DIGIT} | "_")* 
+INT "-"?{DIGITO}+
+
+As constantes inteiras e reais são definidas pelas expressões regulares seguintes: <integer>	::=	-? <digit>+
+
+
+NUMBER			[0-9]+
+//StringValue		\"[^"]*\\""
+
+%%
+
+/* single character ops */
+"+" |
+"-" |
+"*" |
+"/" |
+"=" |
+"|" |
+"," |
+";" |
+"?" | 
+">" |
+"<" |
+"(" |
+")"     { return yytext[0]; }
+
+//NUMBER STRING  IDENTIFIER
+
+ /* operators ops */
+"!="    { return DIFFER; }
+"=="    { return EQUAL ; }
+">="    { return GREATER_OR_EQUAL ; }
+"<="    { return LOWER_OR_EQUAL ; } 
+"**"    { return EXPONENTIAL ; }
+"||"    { return ||; }
+
+ /* keywords */
+"IF"    { return IF; }
+"THEN"  { return THEN; }
+"ELSE"  { return ELSE; }
+"WHILE" { return WHILE; }
+"SAY"   { return SAY ; }
+"ASK"   { return ASK ; }
+"PRED"  { return PRED; }
+"SUCC"  { return SUCC; }
+"GOTO"  { return GOTO; }
+"DOWN"  { return DOWN ; }
+"UP"    { return UP; }
+"PEN"   { return PEN; }
+"RLEFT" { return RLEFT; }
+"RRIGHT" { return RRIGHT; }
+"BACKWARD" { return BACKWARD ; }
+"FORWARD"  { return FORWARD; }
+"FALSE"    { return FALSE; }
+"TRUE"     { return TRUE; }
+"PROGRAM" { return PROGRAM ;}
+"DECLARATIONS" { return DECLARATIONS; }
+"STATEMENTS" { return STATEMENTS ; }
+"INTEGER" { return INTEGER; }
+"BOOLEAN" { return BOOLEAN ; }
+"ARRAY" { return ARRAY; }
+"SIZE" { return SIZE ; }
+
+ /* built in functions */
+
+ /* debug hack */
+"debug"[0-9]+ { debug = atoi(&yytext[5]); printf("debug set to %d\n", debug); }
+
+ /* names */
+[a-zA-Z][a-zA-Z0-9]*  { yylval.s = lookup(yytext); return NAME; }
+
+[0-9]+"."[0-9]*{EXP}? |
+"."?[0-9]+{EXP}? { yylval.d = atof(yytext); return NUMBER; }
+
+"//".*  
+[ \t]   /* ignore white space */ 
+\\\n    printf("c> "); /* ignore line continuation */
+"\n"    { return EOL; }
+
+.	{ yyerror("Mystery character %c\n", *yytext); }
+%%
+
+/* ------------------------------------------ */
+
+
+/* ------------------------------------------ */
+
+%%
+/* single character */ 
+"+"
+"-"
+"*"
+
+%{
+/* S√≠mbolos */
+%}
+OpenBracket		\{
+CloseBracket	\}
+DecArrow	 	\-\> 
+EndLine			\;
+Comma			\,
+Attrib			\=
+
+OpenParent		\(
+CloseParent		\)
+OpenArray		\[
+CloseArray		\]
+QuestionMark	\?
+ExclamationMark	\!
+
+PlusSign		\+
+MinusSign		\-
+OrSign			\|\|
+
+MultSign		\*
+DivSign			\/
+AndSign			\&\&
+ExpSign			\*\*
+
+Equals			\=\=
+Diff			\!\=
+Lesser			\<
+Greater			\>
+LessEquals		\<\=
+GreatEquals		\>\=
+
+/* ------------------------------------------ */
+
+%{
+/* Palavras reservadas */
+%}
+PROGRAM			PROGRAM
+DECLARATIONS	DECLARATIONS
+STATEMENTS		STATEMENTS
+INTEGER			INTEGER
+BOOLEAN			BOOLEAN
+ARRAY			ARRAY
+SIZE			SIZE
+TRUE			TRUE
+FALSE			FALSE
+
+FORWARD			FORWARD
+BACKWARD		BACKWARD
+RRIGHT			RRIGHT
+RLEFT			RLEFT
+PEN				PEN
+UP				UP
+DOWN			DOWN
+GOTO			GOTO
+WHERE			WHERE
+
+IN				in
+
+SUCC			SUCC
+PRED			PRED
+
+SAY				SAY
+ASK				ASK
+
+IF				IF
+THEN			THEN
+ELSE			ELSE
+
+WHILE			WHILE
+
+/* ------------------------------------------ */
+
+%%
+{Space}			{ ; }
+
+{identifier}		{ yyval.tipoString = strdup(yytext);	
+				  	return identifier; }				
+{number}			{ yyval.tipoInt = atoi(yytext);
+				  	return number; }
+{stringValue}		{ return stringValue; }
+.					{ return yytext[0]; }
+
+{OpenBracket}		{ return OpenBracket; }
+{CloseBracket}  	{ return CloseBracket; }
+{DecArrow}      	{ return DecArrow; }
+{EndLine}			{ return EndLine; }
+{Comma} 			{ return Comma; }
+{Attrib}			{ return Attrib; }
+
+{OpenParent}		{ return OpenParent; }
+{CloseParent}		{ return CloseParent; }
+{OpenArray}     	{ return CloseParent; }
+{CloseArray}		{ return CloseArray; }
+{QuestionMark}		{ return QuestionMark; }
+{ExclamationMark} 	{ return ExclamationMark; }
+
+{PlusSign}			{ return PlusSign; }
+{MinusSign}			{ return MinusSign; }
+{OrSign}			{ return OrSign; }
+
+{MultSign}			{ return MultSign; }
+{DivSign}			{ return DivSign; }
+{AndSign}			{ return AndSign; }
+{ExpSign}			{ return ExpSign; }
+
+{Equals}			{ return Equals; }
+{Diff}				{ return Diff; }
+{Lesser}			{ return Lesser; }
+{Greater}			{ return Greater; }
+{LessEquals}		{ return LessEquals; }
+{GreatEquals}		{ return GreatEquals; }
+
+
+{PROGRAM}			{ return PROGRAM; }
+{DECLARATIONS}		{ return DECLARATIONS; }
+{STATEMENTS}		{ return STATEMENTS; }
+{INTEGER}			{ return INTEGER; }
+{BOOLEAN}			{ return BOOLEAN; }
+{ARRAY}				{ return ARRAY; }
+{SIZE}				{ return ARRAY; }
+{TRUE}				{ return TRUE; }
+{FALSE}				{ return FALSE; }
+
+{FORWARD}			{ return FORWARD; }
+{BACKWARD}			{ return BACKWARD; }
+{RRIGHT}			{ return RRIGHT; }
+{RLEFT}				{ return RLEFT; }
+{PEN}				{ return PEN; }
+{UP}				{ return PEN; }
+{DOWN}				{ return DOWN; }
+{GOTO}				{ return DOWN; }
+{WHERE}				{ return WHERE; }	
+
+{IN}				{ return in;}
+
+{SUCC}				{ return SUCC; }
+{PRED}				{ return PRED; }
+
+{SAY}				{ return SAY; }
+{ASK}				{ return ASK; }
+
+{IF}				{ return IF; }
+{THEN}				{ return THEN; }
+{ELSE}				{ return ELSE; }
+
+{WHILE}				{ return WHILE; }
+%%
+
+/* ------------------------------------------ */
+
+
+int yywrap()
+{ return(1); }
+
+int main()
+{ yylex(); return 0; }

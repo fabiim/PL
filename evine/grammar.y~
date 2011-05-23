@@ -1,0 +1,7 @@
+
+
+liss : PROGRAM IDENTIFIER  '{'  body '}' ; 
+
+body : DECLARATIONS declarations STATEMENTS statements ; 
+
+declarations : 

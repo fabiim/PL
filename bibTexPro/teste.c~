@@ -1,0 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void setFieldString(char **field, char *string){
+    char *result = string ; 
+    while (isspace(*result++)); 
+    string += strlen(string)/sizeof(char); 
+    while(isspace(*result--)); 
+    * (++result) = '\0'; 
+}

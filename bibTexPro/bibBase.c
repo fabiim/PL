@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <ctype.h>
 #include "include/hashing.h"
 #include "include/dictlist.h"
 #include "bibBase.h"
+
 
 struct db{
   HashTable  *categorias;  // vai conter Categoria, indexada por categoria 
@@ -16,6 +17,35 @@ typedef struct categoria{
   DictList *citations; // vai conter References   , indexadas por citKey.
 }Categoria;
 
+
+Reference *initRef(){
+    Reference *ref = malloc(sizeof(Reference)); 
+    if (!ref) exit(EXIT_FAILURE); 
+    ref->nAutores = 0; 
+    ref->citKey = NULL; 
+    ref->autores = NULL; 
+    ref->size = 0; 
+    ref->title = NULL; 
+    return ref; 
+}
+char * cleanString( char *string){
+    char *result = string ; 
+    while (isspace(*result)) result++; 
+    string += strlen(string); 
+    while(isspace(*string--)) ; 
+    *string = '\0'; 
+    return strdup(result); 
+}
+
+void add(Reference *ref , char *author){
+  if ((ref->nAutores - ref->size) <= 1){
+    ref->autores = realloc(ref->autores,(ref->size + 4) * sizeof(char *)); 
+    if (!ref->autores) exit(EXIT_FAILURE); 
+    ref->size += 4; 
+  }
+  ref->autores[ref->nAutores++] = cleanString(author); 
+  ref->autores[ref->nAutores] = NULL; 
+}
 
 unsigned hash(const void * key , unsigned size){
   char *s = (char *) key; 
@@ -59,6 +89,7 @@ int  addCitation(DB * bibBase , char * categoria , Reference *ref){
   
   return ret; 
 }
+
 
 void print_entry(void *keyptr, void *dataptr, void *foodataptr); 
 

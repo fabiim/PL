@@ -1,0 +1,40 @@
+\documentclass[a4paper]{article}
+\usepackage[portuges]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{url}
+\usepackage{listings}
+
+\setlength{\oddsidemargin}{-1cm}
+\setlength{\textwidth}{18cm}
+\setlength{\headsep}{-1cm}
+\setlength{\textheight}{23cm}
+
+\parindent=0pt
+\parskip=2pt
+\newtheorem{questao}{Quest\~{a}o}
+
+\def\wiki{\textsf{Wikipedia}}
+
+\begin{document}
+
+\title{}
+\author{Trabalho Prático nº 1\\ (Lex)}
+\date{Ano lectivo 10/11}
+
+\maketitle
+
+\section{Análise do problema}
+\label{sec:analise}
+%--------------------------------------------------------------------------
+\section{Geração de ficheiros e Estruturas de dados}
+A análise do problema apresentado em \ref{sec:analise} conclui a segmentação da resolução em dois módulos fundamentais. O componente lex permite a análise léxica e produção de tokens a serem consumidos pelo componente bibBase. Este último suporta a informação  contida no documento original num formato por nós escolhido de forma a permitir a criação dos ficheiros html e dot conforme requerido no enunciado.
+
+Os tokens a produzir pelo lex são descritos conforme a estrutura presente em \ref{fig:token}. Estes tokens suportam  parte da informação contida numa citação qualquer presente no ficheiro bibTex. Além destes o bibBase  precissa de saber a  categoria correspondente à chave de citação. Uma adição à base de conhecimento de uma citação necessita \textbf{obrigatoriamente} destes componentes.
+
+
+A estrutura de suporte - que contém toda a informação produzida pelo lex - é uma hashTable indexada pela categoria em que para cada entrada desta se podem encontrar uma lista ligada de referencias (\ref{fig:token}). Sendo a produção do ficheiro html facilitada e complicado um pouco a do dot em termos de complexidade. A estrutura pode-se ver na figura (\ref{fig:estrutura}).  A partir desta pode-se facilmente proceder à geração dos ficheiros indicados percorrendo a estrutura e gerando o ficheiro ao mesmo tempo. 
+
+O caso do dot introduz complexidade. A geração do documento é um bocado pesada visto que é necessário percorrer todas as citações presentes na estrutura. A complexidade da produção do documento não foi considerada por nós . O problema seria facilmente resolvido introduzindo um maior gasto de memória pela nossa parte, mas não tido sido considerado por nós como objectivo do trabalho , não o fizémos. 
+
+
+\end{document}
